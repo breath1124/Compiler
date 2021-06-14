@@ -1,0 +1,16 @@
+F:\fsharp\plzoofs\microc\bin\Debug\net5.0\machine.exe
+F:\fsharp\plzoofs\microc\bin\Debug\net5.0\machine.deps.json
+F:\fsharp\plzoofs\microc\bin\Debug\net5.0\machine.runtimeconfig.json
+F:\fsharp\plzoofs\microc\bin\Debug\net5.0\machine.runtimeconfig.dev.json
+F:\fsharp\plzoofs\microc\bin\Debug\net5.0\machine.dll
+F:\fsharp\plzoofs\microc\bin\Debug\net5.0\ref\machine.dll
+F:\fsharp\plzoofs\microc\bin\Debug\net5.0\machine.pdb
+F:\fsharp\plzoofs\microc\obj\Debug\net5.0\machine.csprojAssemblyReference.cache
+F:\fsharp\plzoofs\microc\obj\Debug\net5.0\machine.GeneratedMSBuildEditorConfig.editorconfig
+F:\fsharp\plzoofs\microc\obj\Debug\net5.0\machine.AssemblyInfoInputs.cache
+F:\fsharp\plzoofs\microc\obj\Debug\net5.0\machine.AssemblyInfo.cs
+F:\fsharp\plzoofs\microc\obj\Debug\net5.0\machine.csproj.CoreCompileInputs.cache
+F:\fsharp\plzoofs\microc\obj\Debug\net5.0\machine.dll
+F:\fsharp\plzoofs\microc\obj\Debug\net5.0\ref\machine.dll
+F:\fsharp\plzoofs\microc\obj\Debug\net5.0\machine.pdb
+F:\fsharp\plzoofs\microc\obj\Debug\net5.0\machine.genruntimeconfig.cache
