@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "f:\\fsharp\\plzoofs\\microc\\microcc.fsproj": {}
+    "F:\\fsharp\\final_hw\\microcc.fsproj": {}
   },
   "projects": {
-    "f:\\fsharp\\plzoofs\\microc\\microcc.fsproj": {
+    "F:\\fsharp\\final_hw\\microcc.fsproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "f:\\fsharp\\plzoofs\\microc\\microcc.fsproj",
+        "projectUniqueName": "F:\\fsharp\\final_hw\\microcc.fsproj",
         "projectName": "microcc",
-        "projectPath": "f:\\fsharp\\plzoofs\\microc\\microcc.fsproj",
+        "projectPath": "F:\\fsharp\\final_hw\\microcc.fsproj",
         "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-        "outputPath": "f:\\fsharp\\plzoofs\\microc\\obj\\",
+        "outputPath": "F:\\fsharp\\final_hw\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config"

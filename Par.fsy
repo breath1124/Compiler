@@ -1,13 +1,13 @@
 %{
 
-open Absyn
+open AbstractSyn
 
 // Vardesc 返回的是一个 元组 (g,s)
 // g是类型构造函数，s是变量名
 // compose1 函数 取出 类型构造子 g，用类型复合机制构造类型。
 
 let compose1 f (g, s) = ((fun x -> g(f(x))), s)
-let nl = CstI 10 //  \n 的 ASCII 码
+let nl = CstInt 10 //  \n 的 ASCII 码
 
 let first   (a, _, _) = a
 let second  (_, b, _) = b
@@ -17,7 +17,7 @@ let third   (_, _, c) = c
 
 %token <int> CSTINT CSTBOOL  // <int> 是词元的语义值类型
 %token <string> CSTSTRING NAME
-%token <float> CSTFLOAT
+%token <float32> CSTFLOAT
 %token <char> CSTCHAR
 
 %token CHAR ELSE IF INT NULL PRINT PRINTLN RETURN VOID WHILE FLOAT SWITCH CASE FOR IN RANGE STRING DO LOOP CONTINUE BREAK
@@ -42,7 +42,7 @@ let third   (_, _, c) = c
 %nonassoc LBRACK          /* 最高优先级 */
 
 %start Main            // 语法开始符号
-%type <Absyn.program> Main   // 开始符号，对应抽象语法树节点类型, program
+%type <AbstractSyn.program> Main   // 开始符号，对应抽象语法树节点类型, program
 
 %%
 
@@ -91,10 +91,10 @@ NAME  "n"   (fun t->t, "n") 返回一个元组，第一个元素，是类型构�
 // 变量描述
 VarDescribe:                         
     NAME                                    { ((fun t -> t), $1)                      }
-  | TIMES VarDescribe                       { compose1 TypP $2                        }                                 
+  | TIMES VarDescribe                       { compose1 TypPoint $2                        }                                 
   | LPAR VarDescribe RPAR                   { $2                                      } 
-  | VarDescribe LBRACK RBRACK               { compose1 (fun t -> TypA(t, None)) $1    }
-  | VarDescribe LBRACK CSTINT RBRACK        { compose1 (fun t -> TypA(t, Some $3)) $1 }
+  | VarDescribe LBRACK RBRACK               { compose1 (fun t -> TypArray(t, None)) $1    }
+  | VarDescribe LBRACK CSTINT RBRACK        { compose1 (fun t -> TypArray(t, Some $3)) $1 }
 ;
 
 FunDec:
@@ -145,7 +145,6 @@ StmtM:  /* No unbalanced if-else */
   | WHILE LPAR Expr RPAR StmtM          { While($3, $5)        }
   | DO StmtM WHILE LPAR Expr RPAR SEMI { DoWhile($2, $5) }
   | SWITCH LPAR Expr RPAR LBRACE StmtCase RBRACE    { Switch($3, $6) }
-  | TRY StmtM StmtCatch                 { Try($2, $3) }
 ;
 
 StmtCase:
@@ -153,14 +152,6 @@ StmtCase:
   | CASE AtExprNotAccess COLON StmtM StmtCase   { Case($2, $4) :: $5 }
 ;
 
-StmtCatch:
-    CATCH LPAR EXCEPTION RPAR StmtM             { [Catch($3, $5)] }
-  | CATCH LPAR EXCEPTION RPAR StmtM StmtCatch   { Catch($3, $5) :: $6 }
-;
-
-EXCEPTION:
-    CSTSTRING                           { Exception $1 }
-;
 
 StmtU:
     IF LPAR Expr RPAR StmtM ELSE StmtU  { If($3, $5, $7)       }
@@ -196,17 +187,17 @@ ExprNotAccess:
   | Expr LT    Expr                     { BinaryPrim("<",  $1, $3) }
   | Expr GE    Expr                     { BinaryPrim(">=", $1, $3) }
   | Expr LE    Expr                     { BinaryPrim("<=", $1, $3) }
-  | Expr QUEST Expr COLON Expr          { TernaryPrim("?", $1, $3, $5) }
+  | Expr QUEST Expr COLON Expr          { TernaryPrim($1, $3, $5) }
   | Expr SEQAND Expr                    { Andalso($1, $3)     }
   | Expr SEQOR  Expr                    { Orelse($1, $3)      }
 ;
 
 AtExprNotAccess:
     //不可以为左值的的基本情况 
-    Const                               { ConstI $1             }
-  | ConstString                         { ConstString($1) }
-  | ConstChar                           { ConstChar($1) }
-  | ConstFloat                          { ConstFloat($1) }
+    Const                               { CstInt $1             }
+  | ConstString                         { CstString($1) }
+  | ConstChar                           { CstChar($1) }
+  | ConstFloat                          { CstFloat($1) }
   | LPAR ExprNotAccess RPAR             { $2                  } 
   | AMP Access                          { Addr $2             } // 取地址
 ;

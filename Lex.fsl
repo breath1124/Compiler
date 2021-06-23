@@ -19,6 +19,7 @@ let keyword s =
     | "false"   -> CSTBOOL 0
     | "if"      -> IF
     | "int"     -> INT
+    | "float"   -> FLOAT
     | "null"    -> NULL
     | "print"   -> PRINT
     | "println" -> PRINTLN
@@ -36,9 +37,6 @@ let keyword s =
     | "in"      -> IN
     | "struct"  -> STRUCT
     | "string"  -> STRING
-    | "try"     -> TRY
-    | "catch"   -> CATCH
-    | "throw"   -> THROW
     | _         -> NAME s   // 缺省情况，是标识符的名字，如 函数名，变量名等
 
 // 字符串转义符处理函数
@@ -60,10 +58,10 @@ rule Token = parse          // 每个 规则rule 会生成为一个函数，函�
   | [' ' '\t' '\r'] { Token lexbuf } 
   | '\n'            { lexbuf.EndPos <- lexbuf.EndPos.NextLine; Token lexbuf }                                                                             
   | ['0'-'9']+      { CSTINT (System.Int32.Parse (lexemeAsString lexbuf)) }
-  | ['0'-'9']+'.'['0'-'9']+
-                    { CSTFLOAT (System.Single.Parse (lexemeAsString lexbuf)) }
-  | ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']*
-                    { keyword (lexemeAsString lexbuf) } //标识符处理
+  | ['0'-'9']+'.'['0'-'9']+ 
+                    { CSTFLOAT (System.Single.Parse (lexemeAsString lexbuf)) }  
+  | ['_''a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']*
+                    { keyword (lexemeAsString lexbuf) }  //标识符处理
   | '+'             { PLUS } 
   | '-'             { MINUS } 
   | '*'             { TIMES } 
@@ -96,6 +94,8 @@ rule Token = parse          // 每个 规则rule 会生成为一个函数，函�
   | "//"            { EndLineComment lexbuf; Token lexbuf }  //单行注释
   | "/*"            { Comment lexbuf; Token lexbuf }   // 多行注释，调用 Comment规则
   | '"'             { CSTSTRING (String [] lexbuf) }   // 调用字符串处理规则
+  | ['\'']['a'-'z''A'-'Z''0'-'9']['\'']            
+                    { try let single = lexemeAsString lexbuf in CSTCHAR (System.Char.Parse(single.Substring(1, 1))) with ex -> failwith "Char literal error." }
   | eof             { EOF }
   | _               { failwith "Lexer error: illegal symbol" }
 
