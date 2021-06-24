@@ -171,6 +171,14 @@ let rec cStmt stmt (varEnv : VarEnv) (funEnv : FunEnv) (lablist : LabEnv) (C : i
       let C2 = Label label :: cExpr e3 varEnv funEnv lablist (addINCSP -1 C1)
       let C3 = cStmt stmt varEnv funEnv lablist C2
       cExpr e1 varEnv funEnv lablist (addINCSP -1 (addJump jumptest (Label labStart :: C3)))
+    | DoWhile(body, e)    ->
+      let labbegin = newLabel()
+      let C1 = 
+        cExpr e varEnv funEnv lablist (IFNZRO labbegin :: C)
+      Label labbegin :: cStmt body varEnv funEnv lablist C1
+      // let (jumptest, C1) =
+        // makeJump (cExpr e varEnv funEnv lablist (IFNZRO labbegin :: C))
+      // addJump jumptest (Label labbegin :: cStmt body varEnv funEnv lablist C1)
 
     | If(e, stmt1, stmt2) -> 
       let (jumpend, C1) = makeJump C
