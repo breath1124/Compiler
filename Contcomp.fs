@@ -214,11 +214,28 @@ and cExpr (e : expr) (varEnv : VarEnv) (funEnv : FunEnv) (lablist : LabEnv) (C :
     | CstChar i      -> addCSTC i C
     | Addr acc       -> cAccess acc varEnv funEnv lablist C
     | UnaryPrim(ope, e1) ->
+      let rec temp start =
+                   match start with
+                   | Access (c) -> c
       cExpr e1 varEnv funEnv lablist
           (match ope with
            | "!"      -> addNOT C
            | "printi" -> PRINTI :: C
            | "printc" -> PRINTC :: C
+           | "I++"    ->
+                let ass = Assign (temp e1, BinaryPrim ("+", Access (temp e1), CstInt 1))
+                cExpr ass varEnv funEnv lablist (addINCSP -1 C)
+           | "I--"    ->
+                let ass = Assign (temp e1, BinaryPrim ("-", Access (temp e1), CstInt 1))
+                cExpr ass varEnv funEnv lablist (addINCSP -1 C)
+           | "++I"    ->
+                let ass = Assign (temp e1, BinaryPrim ("+", Access (temp e1), CstInt 1))
+                let C1 = cExpr ass varEnv funEnv lablist C
+                CSTI 1 :: ADD :: (addINCSP -1 C1)           
+           | "--I"    ->
+                let ass = Assign (temp e1, BinaryPrim ("-", Access (temp e1), CstInt 1))
+                let C1 = cExpr ass varEnv funEnv lablist C
+                CSTI 1 :: SUB :: (addINCSP -1 C1)              
            | _        -> failwith "unknown primitive 1")
     | BinaryPrim(ope, e1, e2) ->
       cExpr e1 varEnv funEnv lablist

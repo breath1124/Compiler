@@ -172,8 +172,8 @@ ExprNotAccess:
   | NOT Expr                            { UnaryPrim("!", $2)      }
   | PRINT Expr                          { UnaryPrim("printi", $2) }
   | PRINTLN                             { UnaryPrim("printc", nl) }
-  | Expr AUTOMINUS                      { UnaryPrim("I++", $1) }
-  | Expr AUTOPLUS                       { UnaryPrim("I--", $1) }
+  | Expr AUTOMINUS                      { UnaryPrim("I--", $1) }
+  | Expr AUTOPLUS                       { UnaryPrim("I++", $1) }
   | AUTOMINUS Expr                      { UnaryPrim("--I", $2) }
   | AUTOPLUS Expr                       { UnaryPrim("++I", $2) }
   | Expr PLUS  Expr                     { BinaryPrim("+",  $1, $3) }

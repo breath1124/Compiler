@@ -1228,7 +1228,7 @@ let _fsyacc_reductions ()  =    [|
                 (
                    (
 # 175 "Par.fsy"
-                                                               UnaryPrim("I++", _1) 
+                                                               UnaryPrim("I--", _1) 
                    )
 # 175 "Par.fsy"
                  : 'gentype_ExprNotAccess));
@@ -1239,7 +1239,7 @@ let _fsyacc_reductions ()  =    [|
                 (
                    (
 # 176 "Par.fsy"
-                                                               UnaryPrim("I--", _1) 
+                                                               UnaryPrim("I++", _1) 
                    )
 # 176 "Par.fsy"
                  : 'gentype_ExprNotAccess));
