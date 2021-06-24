@@ -20,7 +20,7 @@ let third   (_, _, c) = c
 %token <float32> CSTFLOAT
 %token <char> CSTCHAR
 
-%token CHAR ELSE IF INT NULL PRINT PRINTLN RETURN VOID WHILE FLOAT SWITCH CASE FOR IN RANGE STRING DO LOOP CONTINUE BREAK
+%token CHAR ELSE IF INT NULL PRINT PRINTLN RETURN VOID WHILE FLOAT SWITCH CASE DEFAULT FOR IN RANGE STRING DO LOOP CONTINUE BREAK
 %token PLUS MINUS TIMES DIV MOD AUTOPLUS AUTOMINUS
 %token TRY CATCH THROW
 %token EQ NE GT LT GE LE
@@ -141,8 +141,8 @@ StmtM:  /* No unbalanced if-else */
 StmtCase:
     CASE AtExprNotAccess COLON StmtM            { [Case($2, $4)] }
   | CASE AtExprNotAccess COLON StmtM StmtCase   { Case($2, $4) :: $5 }
+  | DEFAULT COLON StmtM                         { [Default($3)] }
 ;
-
 
 StmtU:
     IF LPAR Expr RPAR StmtM ELSE StmtU  { If($3, $5, $7)       }

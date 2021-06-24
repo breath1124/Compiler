@@ -41,6 +41,7 @@ and statement =
   | Block of statementDec list
   | For of expr * expr * expr * statement
   | Loop of statement
+  | Default of statement
   | Case of expr * statement
   | Switch of expr * statement list
   | Range of expr * expr * expr * statement

@@ -194,12 +194,36 @@ let rec cStmt stmt (varEnv : VarEnv) (funEnv : FunEnv) (lablist : LabEnv) (C : i
     | Break ->
       let label = exit lablist
       addGOTO label C
-
     | Continue ->
       let label = exitOne lablist
       let labelBegin = exit label
       addGOTO labelBegin C
+    | Switch(e, body) ->
+      let (labEnd, C1) = addLabel C
+      let lab = labEnd :: lablist
+      let rec allCase case = 
+        match case with
+        | [Case(n, content)] ->
+          let (label, C2) = addLabel(cStmt content varEnv funEnv lablist C1)
+          let (label2, C3) = addLabel(cExpr (BinaryPrim("==", e, n)) varEnv funEnv lablist (IFZERO labEnd :: C2))
+          (label, label2, C3)
+        | Case(n, content) :: tr ->
+          let (labelNextBody, labelNext, C2) = allCase tr
+          let (label, C3) = addLabel(cStmt content varEnv funEnv lablist (addGOTO labelNextBody C2))
+          let (label2, C4) = addLabel(cExpr (BinaryPrim("==", e, n)) varEnv funEnv lablist (IFZERO labelNext :: C3))
+          (label, label2, C4)
+        | [Default(last)] ->
+          let (label, C2) = addLabel(cStmt last varEnv funEnv lablist C1)
+          let (label2, C3) = addLabel(cExpr (BinaryPrim("==", e, e)) varEnv funEnv lablist (IFZERO labEnd :: C2 ))
+          (label, label2, C3)
 
+      let (label, label2, C2) =
+        allCase body
+      C2
+    | Case(n, content) ->
+      C
+    | Default(body) ->
+      C
     | If(e, stmt1, stmt2) -> 
       let (jumpend, C1) = makeJump C
       let (labelse, C2) = addLabel (cStmt stmt2 varEnv funEnv lablist C1)

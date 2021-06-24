@@ -46,6 +46,7 @@ type token =
   | FLOAT
   | SWITCH
   | CASE
+  | DEFAULT
   | FOR
   | IN
   | RANGE
@@ -106,6 +107,7 @@ type tokenId =
     | TOKEN_FLOAT
     | TOKEN_SWITCH
     | TOKEN_CASE
+    | TOKEN_DEFAULT
     | TOKEN_FOR
     | TOKEN_IN
     | TOKEN_RANGE
