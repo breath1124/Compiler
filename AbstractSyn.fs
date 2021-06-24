@@ -6,7 +6,6 @@ type typ =
   | TypString
   | TypFloat
   | TypVoid
-  | TypStruct of string
   | TypArray of typ * int option
   | TypPoint of typ
   | Lambda of typ option * (typ * string) list * statement
@@ -19,7 +18,7 @@ and expr =
   | CstFloat of float32
   | CstString of string
   | CstChar of char
-  | ConstNull of int
+  | CstNull of int
   | NullExpression of int
   | UnaryPrim of string * expr
   | BinaryPrim of string * expr * expr
@@ -32,7 +31,6 @@ and access =
   | AccVar of string
   | AccDeref of expr
   | AccIndex of access * expr
-  | AccMember of access * access
 
 and statement = 
   | If of expr * statement * statement
@@ -57,7 +55,6 @@ and statementDec =
 and topDec = 
   | FunDec of typ option * string * (typ * string) list * statement
   | VarDec of typ * string
-  | StructDec of string * (typ * string) list
   | VarDecAsg of typ * string * expr
  
 and program = 

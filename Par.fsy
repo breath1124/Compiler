@@ -22,7 +22,6 @@ let third   (_, _, c) = c
 
 %token CHAR ELSE IF INT NULL PRINT PRINTLN RETURN VOID WHILE FLOAT SWITCH CASE FOR IN RANGE STRING DO LOOP CONTINUE BREAK
 %token PLUS MINUS TIMES DIV MOD AUTOPLUS AUTOMINUS
-%token STRUCT DOT
 %token TRY CATCH THROW
 %token EQ NE GT LT GE LE
 %token NOT SEQOR SEQAND
@@ -59,17 +58,9 @@ TopDecs:
 TopDec: 
     VarDec SEMI                         { VarDec (fst $1, snd $1) }
   | VarDecAsg SEMI                      { VarDecAsg (first $1, second $1, third $1)}
-  | StructDec SEMI                      { StructDec (fst $1, snd $1)}
   | FunDec                              { $1 }
 ;
 
-StructDec:
-  | STRUCT NAME LBRACE MemberList RBRACE { ($2, $4) }
-;
-
-MemberList:
-  | VarDec SEMI MemberList { $1 :: $3}
-;
 
 /*                                               
 变量声明  由于C 类型声明的复杂性，这里用了函数式编程的技巧来辅助类型构造
@@ -208,7 +199,6 @@ Access:    //可以为左值的情况
   | TIMES Access                        { AccDeref (Access $2)}  // 指针  *x
   | TIMES AtExprNotAccess               { AccDeref $2         }
   | Access LBRACK Expr RBRACK           { AccIndex($1, $3)    }
-  | NAME DOT NAME                       { AccMember(AccVar $1, AccVar $3) }
 ;
 
 Exprs:
@@ -247,5 +237,4 @@ Type:
   | CHAR                                { TypChar       }
   | STRING                              { TypString     }
   | FLOAT                               { TypFloat      }
-  | STRUCT NAME                         { TypStruct($2) }
 ;

@@ -35,7 +35,6 @@ let keyword s =
     | "do"      -> DO
     | "for"     -> FOR
     | "in"      -> IN
-    | "struct"  -> STRUCT
     | "string"  -> STRING
     | _         -> NAME s   // 缺省情况，是标识符的名字，如 函数名，变量名等
 

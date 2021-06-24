@@ -26,8 +26,6 @@ type token =
   | TRY
   | CATCH
   | THROW
-  | STRUCT
-  | DOT
   | PLUS
   | MINUS
   | TIMES
@@ -88,8 +86,6 @@ type tokenId =
     | TOKEN_TRY
     | TOKEN_CATCH
     | TOKEN_THROW
-    | TOKEN_STRUCT
-    | TOKEN_DOT
     | TOKEN_PLUS
     | TOKEN_MINUS
     | TOKEN_TIMES
@@ -131,8 +127,6 @@ type nonTerminalId =
     | NONTERM_Main
     | NONTERM_TopDecs
     | NONTERM_TopDec
-    | NONTERM_StructDec
-    | NONTERM_MemberList
     | NONTERM_VarDec
     | NONTERM_VarDecAsg
     | NONTERM_VarDescribe

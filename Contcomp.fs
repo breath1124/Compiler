@@ -236,7 +236,7 @@ and cExpr (e : expr) (varEnv : VarEnv) (funEnv : FunEnv) (lablist : LabEnv) (C :
                 let ass = Assign (temp e1, BinaryPrim ("-", Access (temp e1), CstInt 1))
                 let C1 = cExpr ass varEnv funEnv lablist C
                 CSTI 1 :: SUB :: (addINCSP -1 C1)              
-           | _        -> failwith "unknown primitive 1")
+           | _        -> failwith "unknown unary, please check it")
     | BinaryPrim(ope, e1, e2) ->
       cExpr e1 varEnv funEnv lablist
         (cExpr e2 varEnv funEnv lablist
@@ -252,7 +252,11 @@ and cExpr (e : expr) (varEnv : VarEnv) (funEnv : FunEnv) (lablist : LabEnv) (C :
             | ">="  -> LT   :: addNOT C
             | ">"   -> SWAP :: LT :: C
             | "<="  -> SWAP :: LT :: addNOT C
-            | _     -> failwith "unknown primitive 2"))
+            | _     -> failwith "unknown binary, please check it"))
+    | TernaryPrim(ope, e1, e2)  ->
+      let (jumpend, C1) = makeJump C
+      let (labelse, C2) = addLabel (cExpr e2 varEnv funEnv lablist C1)
+      cExpr ope varEnv funEnv lablist (IFZERO labelse :: cExpr e1 varEnv funEnv lablist (addJump jumpend C2))
     | Andalso(e1, e2) ->
       match C with
       | IFZERO lab :: _ ->
