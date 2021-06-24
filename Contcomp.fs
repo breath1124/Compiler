@@ -104,12 +104,23 @@ type Var =
     | Locvar of int      
 
 
-
 type VarEnv = (Var * typ) Env * int
 type StructTypeEnv = (string * (Var * typ) Env * int) list 
 type Paramdecs = (typ * string) list
 type FunEnv = (label * typ option * Paramdecs) Env
 type LabEnv = label list
+
+
+let rec exit labs = 
+    match labs with
+    | lab :: tr -> lab
+    | []        -> failwith "error, unknow break, please check your code"
+
+
+let rec exitOne labs =
+    match labs with
+    | lab :: tr -> tr
+    | []        -> []
 
 
 let allocate (kind : int -> Var) (typ, x) (varEnv : VarEnv) : VarEnv * instrs list =
@@ -131,6 +142,7 @@ let bindParam (env, fdepth) (typ, x) : VarEnv =
 
 let bindParams paras (env, fdepth) : VarEnv = 
     List.fold bindParam (env, fdepth) paras;
+
 
 (* ------------------------------------------------------------------- *)
 
@@ -179,6 +191,14 @@ let rec cStmt stmt (varEnv : VarEnv) (funEnv : FunEnv) (lablist : LabEnv) (C : i
       // let (jumptest, C1) =
         // makeJump (cExpr e varEnv funEnv lablist (IFNZRO labbegin :: C))
       // addJump jumptest (Label labbegin :: cStmt body varEnv funEnv lablist C1)
+    | Break ->
+      let label = exit lablist
+      addGOTO label C
+
+    | Continue ->
+      let label = exitOne lablist
+      let labelBegin = exit label
+      addGOTO labelBegin C
 
     | If(e, stmt1, stmt2) -> 
       let (jumpend, C1) = makeJump C
