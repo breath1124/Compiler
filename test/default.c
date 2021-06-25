@@ -9,6 +9,6 @@ int main()
         case 3: print i+3;
         case 5: print i+5;
         case 6: print i+6;
-        default: print n*n;        
+        default: print n*n;     
     }
 }

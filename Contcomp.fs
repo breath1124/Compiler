@@ -184,10 +184,14 @@ let rec cStmt stmt (varEnv : VarEnv) (funEnv : FunEnv) (lablist : LabEnv) (C : i
       let C3 = cStmt stmt varEnv funEnv lablist C2
       cExpr e1 varEnv funEnv lablist (addINCSP -1 (addJump jumptest (Label labStart :: C3)))
     | DoWhile(body, e)    ->
-      let labbegin = newLabel()
+      let labBegin = newLabel()
+
+      let (labEnd, c) = addLabel C
+      let lablist = labEnd :: labBegin :: lablist
+
       let C1 = 
-        cExpr e varEnv funEnv lablist (IFNZRO labbegin :: C)
-      Label labbegin :: cStmt body varEnv funEnv lablist C1
+        cExpr e varEnv funEnv lablist (IFNZRO labBegin :: c)
+      Label labBegin :: cStmt body varEnv funEnv lablist C1
       // let (jumptest, C1) =
         // makeJump (cExpr e varEnv funEnv lablist (IFNZRO labbegin :: C))
       // addJump jumptest (Label labbegin :: cStmt body varEnv funEnv lablist C1)
@@ -224,16 +228,31 @@ let rec cStmt stmt (varEnv : VarEnv) (funEnv : FunEnv) (lablist : LabEnv) (C : i
       C
     | Default(body) ->
       C
+    | Loop(body) ->
+      let labelBegin = newLabel()
+      let (labEnd, c) = addLabel C
+      let lablist = labEnd :: labelBegin :: lablist
+      let e = CstInt 1
+      let (jumptest, C1) =
+        makeJump (cExpr e varEnv funEnv lablist (IFNZRO labelBegin :: c) )
+      addJump jumptest (Label labelBegin :: cStmt body varEnv funEnv lablist C1)
+
+
     | If(e, stmt1, stmt2) -> 
       let (jumpend, C1) = makeJump C
       let (labelse, C2) = addLabel (cStmt stmt2 varEnv funEnv lablist C1)
       cExpr e varEnv funEnv lablist (IFZERO labelse 
        :: cStmt stmt1 varEnv funEnv lablist (addJump jumpend C2))
     | While(e, body) ->
-      let labbegin = newLabel()
+      let labBegin = newLabel()
+
+      // 以下两行实现break
+      let (labEnd, c) = addLabel C
+      let lablist = labEnd :: labBegin :: lablist
+
       let (jumptest, C1) = 
-           makeJump (cExpr e varEnv funEnv lablist (IFNZRO labbegin :: C))
-      addJump jumptest (Label labbegin :: cStmt body varEnv funEnv lablist C1)
+           makeJump (cExpr e varEnv funEnv lablist (IFNZRO labBegin :: c))
+      addJump jumptest (Label labBegin :: cStmt body varEnv funEnv lablist C1)
     | Expr e -> 
       cExpr e varEnv funEnv lablist (addINCSP -1 C) 
     | Block stmts -> 
