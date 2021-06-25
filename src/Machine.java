@@ -112,29 +112,29 @@ public class Machine {
             if (trace)
                 printSpPc(stack, bp, sp, program, pc);
             switch (program.get(pc++)) {
-                case Instruction.CSTI:
+                case CSTI:
                     stack[sp + 1] = new CubyIntType(program.get(pc++)); sp++; break;
-                case Instruction.CSTF:
+                case CSTF:
                     stack[sp + 1] = new CubyFloatType(Float.intBitsToFloat(program.get(pc++))); sp++; break;
-                case Instruction.CSTC:
+                case CSTC:
                     stack[sp + 1] = new CubyCharType((char)(program.get(pc++).intValue())); sp++; break;
-                case Instruction.ADD: {
+                case ADD: {
                     stack[sp - 1] = binaryOperator(stack[sp-1], stack[sp], "+");
                     sp--;
                     break;
                 }
-                case Instruction.SUB:{
+                case SUB:{
                     stack[sp - 1] = binaryOperator(stack[sp-1], stack[sp], "-");
                     sp--;
                     break;
                 }
 
-                case Instruction.MUL: {
+                case MUL: {
                     stack[sp - 1] = binaryOperator(stack[sp-1], stack[sp], "*");
                     sp--;
                     break;
                 }
-                case Instruction.DIV:
+                case DIV:
                     if(((CubyIntType)stack[sp]).getValue()==0)
                     {
                         System.out.println("hr:"+hr+" exception:"+1);
@@ -159,19 +159,19 @@ public class Machine {
                     }
                     
                     break;
-                case Instruction.MOD:
+                case MOD:
                     stack[sp - 1] = binaryOperator(stack[sp-1], stack[sp], "%");
                     sp--;
                     break;
-                case Instruction.EQ:
+                case EQ:
                     stack[sp - 1] = binaryOperator(stack[sp-1], stack[sp], "==");
                     sp--;
                     break;
-                case Instruction.LT:
+                case LT:
                     stack[sp - 1] = binaryOperator(stack[sp-1], stack[sp], "<");
                     sp--;
                     break;
-                case Instruction.NOT: {
+                case NOT: {
                     Object result = null;
                     if(stack[sp] instanceof CubyFloatType){
                         result = ((CubyFloatType)stack[sp]).getValue();
@@ -181,27 +181,27 @@ public class Machine {
                     stack[sp] = (Float.compare(new Float(result.toString()), 0.0f) == 0 ? new CubyIntType(1) : new CubyIntType(0));
                     break;
                 }
-                case Instruction.DUP:
+                case DUP:
                     stack[sp+1] = stack[sp];
                     sp++;
                     break;
-                case Instruction.SWAP: {
+                case SWAP: {
                     CubyBaseType tmp = stack[sp];  stack[sp] = stack[sp-1];  stack[sp-1] = tmp;
                     break;
                 }
-                case Instruction.LDI:
+                case LDI:
                     stack[sp] = stack[((CubyIntType)stack[sp]).getValue()]; break;
-                case Instruction.STI:
+                case STI:
                     stack[((CubyIntType)stack[sp-1]).getValue()] = stack[sp]; stack[sp-1] = stack[sp]; sp--; break;
-                case Instruction.GETBP:
+                case GETBP:
                     stack[sp+1] = new CubyIntType(bp); sp++; break;
-                case Instruction.GETSP:
+                case GETSP:
                     stack[sp+1] = new CubyIntType(sp); sp++; break;
-                case Instruction.INCSP:
+                case INCSP:
                     sp = sp + program.get(pc++); break;
-                case Instruction.GOTO:
+                case GOTO:
                     pc = program.get(pc); break;
-                case Instruction.IFZERO: {
+                case IFZERO: {
                     Object result = null;
                     int index = sp--;
                     if(stack[index] instanceof CubyIntType){
@@ -212,7 +212,7 @@ public class Machine {
                     pc = (Float.compare(new Float(result.toString()), 0.0f) == 0 ? program.get(pc) : pc + 1);
                     break;
                 }
-                case Instruction.IFNZRO: {
+                case IFNZRO: {
                     Object result = null;
                     int index = sp--;
                     if (stack[index] instanceof CubyIntType) {
@@ -223,7 +223,7 @@ public class Machine {
                     pc = (Float.compare(new Float(result.toString()), 0.0f) != 0 ? program.get(pc) : pc + 1);
                     break;
                 }
-                case Instruction.CALL: {
+                case CALL: {
                     int argc = program.get(pc++);
                     for (int i=0; i<argc; i++)
                         stack[sp-i+2] = stack[sp-i];
@@ -233,19 +233,19 @@ public class Machine {
                     pc = program.get(pc);
                     break;
                 }
-                case Instruction.TCALL: {
+                case TCALL: {
                     int argc = program.get(pc++);
                     int pop  = program.get(pc++);
                     for (int i=argc-1; i>=0; i--)
                         stack[sp-i-pop] = stack[sp-i];
                     sp = sp - pop; pc = program.get(pc);
                 } break;
-                case Instruction.RET: {
+                case RET: {
                     CubyBaseType res = stack[sp];
                     sp = sp - program.get(pc); bp = ((CubyIntType)stack[--sp]).getValue(); pc = ((CubyIntType)stack[--sp]).getValue();
                     stack[sp] = res;
                 } break;
-                case Instruction.PRINTI: {
+                case PRINTI: {
                     Object result;
                     if(stack[sp] instanceof CubyIntType){
                         result = ((CubyIntType)stack[sp]).getValue();
@@ -258,15 +258,15 @@ public class Machine {
                     System.out.print(String.valueOf(result) + " ");
                     break;
                 }
-                case Instruction.PRINTC:
+                case PRINTC:
                     System.out.print((((CubyCharType)stack[sp])).getValue()); break;
-                case Instruction.LDARGS:
+                case LDARGS:
                     for (int i=0; i < inputArgs.length; i++) // Push commandline arguments
                         stack[++sp] = inputArgs[i];
                     break;
-                case Instruction.STOP:
+                case STOP:
                     return sp;
-                case Instruction.PUSHHR:{
+                case PUSHHR:{
                     stack[++sp] = new CubyIntType(program.get(pc++));    //exn
                     int tmp = sp;       //exn address
                     sp++;
@@ -275,9 +275,9 @@ public class Machine {
                     hr = tmp;
                     break;
                 }
-                case Instruction.POPHR:
+                case POPHR:
                     hr = ((CubyIntType)stack[sp--]).getValue();sp-=2;break;
-                case Instruction.THROW:
+                case THROW:
                     System.out.println("hr:"+hr+" exception:"+new CubyIntType(program.get(pc)).getValue());
 
                     while (hr != -1 && ((CubyIntType)stack[hr]).getValue() != program.get(pc) )

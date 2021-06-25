@@ -236,7 +236,14 @@ let rec cStmt stmt (varEnv : VarEnv) (funEnv : FunEnv) (lablist : LabEnv) (C : i
       let (jumptest, C1) =
         makeJump (cExpr e varEnv funEnv lablist (IFNZRO labelBegin :: c) )
       addJump jumptest (Label labelBegin :: cStmt body varEnv funEnv lablist C1)
-
+    | Range(e, l, r, body) ->
+      let rec temp start =
+        match start with
+        |Access (c) -> c
+      let ass = Assign (temp e, l)
+      let decide = BinaryPrim("<", Access(temp e), r)
+      let nextOp = Assign(temp e, BinaryPrim("+", Access(temp e), CstInt 1))
+      cStmt (For (ass, decide, nextOp, body)) varEnv funEnv lablist C
 
     | If(e, stmt1, stmt2) -> 
       let (jumpend, C1) = makeJump C
