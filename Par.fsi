@@ -23,9 +23,6 @@ type token =
   | LT
   | GE
   | LE
-  | TRY
-  | CATCH
-  | THROW
   | PLUS
   | MINUS
   | TIMES
@@ -84,9 +81,6 @@ type tokenId =
     | TOKEN_LT
     | TOKEN_GE
     | TOKEN_LE
-    | TOKEN_TRY
-    | TOKEN_CATCH
-    | TOKEN_THROW
     | TOKEN_PLUS
     | TOKEN_MINUS
     | TOKEN_TIMES

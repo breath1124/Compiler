@@ -7,6 +7,7 @@ type instrs =
   | CSTI of int
   | CSTF of int32
   | CSTC of int32
+  | CSTS of int32
   | OFFSET of int
   | GVAR of int
   | ADD
@@ -34,9 +35,6 @@ type instrs =
   | PRINTC
   | LDARGS of int
   | STOP
-  | THROW of int
-  | PUSHHDLR of int * label
-  | POPHDLR
 
 
 let (resetLabels, newLabel) = 
@@ -154,13 +152,8 @@ let CODECSTF   = 26;
 let CODECSTC   = 27;
 
 [<Literal>]
-let CODETHROW  = 28;
+let CODECSTS   = 28;
 
-[<Literal>]
-let CODEPUSHHR = 29;
-
-[<Literal>]
-let CODEPOPHR  = 30;
 
 
 
@@ -175,6 +168,7 @@ let makelabenv (addr, labenv) instrs =
     | CSTI i         -> (addr+2, labenv)
     | CSTF i         -> (addr+2, labenv)
     | CSTC i         -> (addr+2, labenv)
+    | CSTS i         -> (addr+2, labenv)
     | GVAR i         -> (addr+2, labenv)
     | OFFSET i       -> (addr+2, labenv)
     | ADD            -> (addr+1, labenv)
@@ -202,9 +196,6 @@ let makelabenv (addr, labenv) instrs =
     | PRINTC         -> (addr+1, labenv)
     | LDARGS  m      -> (addr+1, labenv)
     | STOP           -> (addr+1, labenv)
-    | THROW i        -> (addr+2, labenv)
-    | PUSHHDLR (exn ,lab) -> (addr+3, labenv)
-    | POPHDLR        -> (addr+1, labenv)
 
 (* Bytecode emission, second pass: output bytecode as integers *)
 
@@ -217,6 +208,7 @@ let rec emitints getlab instrs ints =
     | CSTI i         -> CODECSTI   :: i :: ints
     | CSTF i         -> CODECSTF   :: i :: ints
     | CSTC i         -> CODECSTC   :: i :: ints
+    | CSTS i         -> CODECSTS   :: i :: ints
     | GVAR i         -> CODECSTI   :: i :: ints
     | OFFSET i       -> CODECSTI   :: i :: ints
     | ADD            -> CODEADD    :: ints
@@ -244,9 +236,6 @@ let rec emitints getlab instrs ints =
     | PRINTC         -> CODEPRINTC :: ints
     | LDARGS m       -> CODELDARGS :: ints
     | STOP           -> CODESTOP   :: ints
-    | THROW i        -> CODETHROW  :: i         :: ints
-    | PUSHHDLR (exn, lab) -> CODEPUSHHR :: exn  :: getlab lab :: ints
-    | POPHDLR        -> CODEPOPHR  :: ints
 
 
 (* Convert instruction list to int list in two passes:
@@ -307,5 +296,6 @@ let rec decomp ints : instrs list =
     | CODECSTI   :: i :: ints_rest                    ->   CSTI i             :: decomp ints_rest       
     | CODECSTF   :: i :: ints_rest                    ->   CSTF i             :: decomp ints_rest
     | CODECSTC   :: i :: ints_rest                    ->   CSTC i             :: decomp ints_rest
+    | CODECSTS   :: i :: ints_rest                    ->   CSTS i             :: decomp ints_rest
     | _                                       ->    printf "%A" ints; failwith "unknow code"
 

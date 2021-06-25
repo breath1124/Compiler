@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 public class Machine {
-    private final static int STACKSIZE = 1000;
     
     CubyStringType str = new CubyStringType();
 
@@ -28,20 +27,19 @@ public class Machine {
     }
 
     final static int
-      CSTI = 0, ADD = 1, SUB = 2, MUL = 3, DIV = 4, MOD = 5, 
-      EQ = 6, LT = 7, NOT = 8, 
-      DUP = 9, SWAP = 10, 
-      LDI = 11, STI = 12, 
-      GETBP = 13, GETSP = 14, INCSP = 15, 
-      GOTO = 16, IFZERO = 17, IFNZRO = 18, CALL = 19, TCALL = 20, RET = 21, 
-      PRINTI = 22, PRINTC = 23, 
-      LDARGS = 24,
-      STOP = 25,
-      CSTF = 26, CSTC = 27, THROW = 28, PUSHHR = 29, POPHR = 30;
-    
-    
+        CSTI = 0, ADD = 1, SUB = 2, MUL = 3, DIV = 4, MOD = 5, 
+        EQ = 6, LT = 7, NOT = 8, 
+        DUP = 9, SWAP = 10, 
+        LDI = 11, STI = 12, 
+        GETBP = 13, GETSP = 14, INCSP = 15, 
+        GOTO = 16, IFZERO = 17, IFNZRO = 18, CALL = 19, TCALL = 20, RET = 21, 
+        PRINTI = 22, PRINTC = 23, 
+        LDARGS = 24,
+        STOP = 25,
+        CSTF = 26, CSTC = 27, CSTS = 28;
+  
+  
     final static int STACKSIZE = 1000;
-
 
     static void execute(String[] args, boolean trace) throws FileNotFoundException, IOException, OperatorError, ImcompatibleTypeError {
         ArrayList<Integer> program = readfile(args[0]);
@@ -118,6 +116,8 @@ public class Machine {
                     stack[sp + 1] = new CubyFloatType(Float.intBitsToFloat(program.get(pc++))); sp++; break;
                 case CSTC:
                     stack[sp + 1] = new CubyCharType((char)(program.get(pc++).intValue())); sp++; break;
+                case CSTS:
+                    stack[sp + 1] = new CubyStringType((String.valueOf(program.get(pc++).intValue()))); sp++; break;
                 case ADD: {
                     stack[sp - 1] = binaryOperator(stack[sp-1], stack[sp], "+");
                     sp--;
@@ -251,6 +251,8 @@ public class Machine {
                         result = ((CubyIntType)stack[sp]).getValue();
                     }else if(stack[sp] instanceof CubyFloatType){
                         result = ((CubyFloatType)stack[sp]).getValue();
+                    }else if(stack[sp] instanceof CubyStringType){
+                        result = ((CubyStringType)stack[sp]).getValue();
                     }else {
                         result = ((CubyCharType)stack[sp]).getValue();
                     }
@@ -266,35 +268,7 @@ public class Machine {
                     break;
                 case STOP:
                     return sp;
-                case PUSHHR:{
-                    stack[++sp] = new CubyIntType(program.get(pc++));    //exn
-                    int tmp = sp;       //exn address
-                    sp++;
-                    stack[sp++] = new CubyIntType(program.get(pc++));   //jump address
-                    stack[sp] = new CubyIntType(hr);
-                    hr = tmp;
-                    break;
-                }
-                case POPHR:
-                    hr = ((CubyIntType)stack[sp--]).getValue();sp-=2;break;
-                case THROW:
-                    System.out.println("hr:"+hr+" exception:"+new CubyIntType(program.get(pc)).getValue());
-
-                    while (hr != -1 && ((CubyIntType)stack[hr]).getValue() != program.get(pc) )
-                    {
-                        hr = ((CubyIntType)stack[hr+2]).getValue(); //find exn address
-                        System.out.println("hr:"+hr+" exception:"+new CubyIntType(program.get(pc)).getValue());
-                    }
-                        
-                    if (hr != -1) { // Found a handler for exn
-                        sp = hr-1;    // remove stack after hr
-                        pc = ((CubyIntType)stack[hr+1]).getValue();
-                        hr = ((CubyIntType)stack[hr+2]).getValue(); // with current handler being hr     
-                    } else {
-                        System.out.print(hr+"not find exception");
-                        return sp;
-                    }break;
-
+            
                 default:
                     throw new RuntimeException("Illegal instruction " + program.get(pc-1)
                             + " at address " + (pc-1));
@@ -417,37 +391,35 @@ public class Machine {
 
     private static String insName(ArrayList<Integer> program, int pc) {
         switch (program.get(pc)) {
-            case Instruction.CSTI:   return "CSTI " + program.get(pc+1);
-            case Instruction.CSTF:   return "CSTF " + program.get(pc+1);
-            case Instruction.CSTC:   return "CSTC " + (char)(program.get(pc+1).intValue());
-            case Instruction.ADD:    return "ADD";
-            case Instruction.SUB:    return "SUB";
-            case Instruction.MUL:    return "MUL";
-            case Instruction.DIV:    return "DIV";
-            case Instruction.MOD:    return "MOD";
-            case Instruction.EQ:     return "EQ";
-            case Instruction.LT:     return "LT";
-            case Instruction.NOT:    return "NOT";
-            case Instruction.DUP:    return "DUP";
-            case Instruction.SWAP:   return "SWAP";
-            case Instruction.LDI:    return "LDI";
-            case Instruction.STI:    return "STI";
-            case Instruction.GETBP:  return "GETBP";
-            case Instruction.GETSP:  return "GETSP";
-            case Instruction.INCSP:  return "INCSP " + program.get(pc+1);
-            case Instruction.GOTO:   return "GOTO " + program.get(pc+1);
-            case Instruction.IFZERO: return "IFZERO " + program.get(pc+1);
-            case Instruction.IFNZRO: return "IFNZRO " + program.get(pc+1);
-            case Instruction.CALL:   return "CALL " + program.get(pc+1) + " " + program.get(pc+2);
-            case Instruction.TCALL:  return "TCALL " + program.get(pc+1) + " " + program.get(pc+2) + " " +program.get(pc+3);
-            case Instruction.RET:    return "RET " + program.get(pc+1);
-            case Instruction.PRINTI: return "PRINTI";
-            case Instruction.PRINTC: return "PRINTC";
-            case Instruction.LDARGS: return "LDARGS";
-            case Instruction.STOP:   return "STOP";
-            case Instruction.THROW:  return "THROW" + program.get(pc+1);
-            case Instruction.PUSHHR: return "PUSHHR" + " " + program.get(pc+ 1) + " " + program.get(pc+2) ;
-            case Instruction.POPHR: return "POPHR";
+            case CSTI:   return "CSTI " + program.get(pc+1);
+            case CSTF:   return "CSTF " + program.get(pc+1);
+            case CSTC:   return "CSTC " + (char)(program.get(pc+1).intValue());
+            case CSTS:   return "CSTS " + (String.valueOf(program.get(pc+1).intValue()));
+            case ADD:    return "ADD";
+            case SUB:    return "SUB";
+            case MUL:    return "MUL";
+            case DIV:    return "DIV";
+            case MOD:    return "MOD";
+            case EQ:     return "EQ";
+            case LT:     return "LT";
+            case NOT:    return "NOT";
+            case DUP:    return "DUP";
+            case SWAP:   return "SWAP";
+            case LDI:    return "LDI";
+            case STI:    return "STI";
+            case GETBP:  return "GETBP";
+            case GETSP:  return "GETSP";
+            case INCSP:  return "INCSP " + program.get(pc+1);
+            case GOTO:   return "GOTO " + program.get(pc+1);
+            case IFZERO: return "IFZERO " + program.get(pc+1);
+            case IFNZRO: return "IFNZRO " + program.get(pc+1);
+            case CALL:   return "CALL " + program.get(pc+1) + " " + program.get(pc+2);
+            case TCALL:  return "TCALL " + program.get(pc+1) + " " + program.get(pc+2) + " " +program.get(pc+3);
+            case RET:    return "RET " + program.get(pc+1);
+            case PRINTI: return "PRINTI";
+            case PRINTC: return "PRINTC";
+            case LDARGS: return "LDARGS";
+            case STOP:   return "STOP";
             default:     return "<unknown>";
         }
     }

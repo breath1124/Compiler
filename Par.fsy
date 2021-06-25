@@ -22,7 +22,6 @@ let third   (_, _, c) = c
 
 %token CHAR ELSE IF INT NULL PRINT PRINTLN RETURN VOID WHILE FLOAT SWITCH CASE DEFAULT FOR IN RANGE STRING DO LOOP CONTINUE BREAK
 %token PLUS MINUS TIMES DIV MOD AUTOPLUS AUTOMINUS
-%token TRY CATCH THROW
 %token EQ NE GT LT GE LE
 %token NOT SEQOR SEQAND
 %token LPAR RPAR LBRACE RBRACE LBRACK RBRACK SEMI COMMA ASSIGN AMP QUEST COLON
@@ -134,7 +133,7 @@ StmtM:  /* No unbalanced if-else */
   | Block                               { $1                   }
   | IF LPAR Expr RPAR StmtM ELSE StmtM  { If($3, $5, $7)       }
   | WHILE LPAR Expr RPAR StmtM          { While($3, $5)        }
-  | DO StmtM WHILE LPAR Expr RPAR SEMI { DoWhile($2, $5) }
+  | DO StmtM WHILE LPAR Expr RPAR SEMI  { DoWhile($2, $5) }
   | SWITCH LPAR Expr RPAR LBRACE StmtCase RBRACE    { Switch($3, $6) }
 ;
 

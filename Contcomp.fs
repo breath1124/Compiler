@@ -87,7 +87,15 @@ let rec addCSTC i C =
     match (i, C) with
     | _                     -> (CSTC ((int32)(System.BitConverter.ToInt16((System.BitConverter.GetBytes(char(i))),0)))) :: C
 
+let encoding = System.Text.ASCIIEncoding();
 
+// let rec addCSTS i C = 
+//     match (i, C) with
+//     | _                     -> (CSTS ((int32)(System.BitConverter.ToString ((encoding.GetBytes(string(i))),0)))) :: C
+
+let rec addCSTS i C = 
+    match (i, C) with
+    | _                     -> (CSTS ((int32)(System.BitConverter.ToString (System.Text.Encoding.Default.GetBytes(i+""))))) :: C
 
 (* 环境 *)
 
@@ -244,6 +252,18 @@ let rec cStmt stmt (varEnv : VarEnv) (funEnv : FunEnv) (lablist : LabEnv) (C : i
       let decide = BinaryPrim("<", Access(temp e), r)
       let nextOp = Assign(temp e, BinaryPrim("+", Access(temp e), CstInt 1))
       cStmt (For (ass, decide, nextOp, body)) varEnv funEnv lablist C
+    // | Try(stmt, catch) ->
+    //   let exps = [Exception "Excption because of math compute"]
+    //   let rec lookupExp e (es : Exception list) expdepth = 
+    //     match es with
+    //     | head :: tail -> if e = head then expdepth else lookupExp e tail expdepth+1
+    //     | [] -> -1
+    //   let (labEnd, C1) = addLabel C
+    //   let lablist = labEnd :: lablist
+    //   let (env, fdepth) = varEnv
+    //   let varEnv = (env, fdepth+3*catch.length)
+    //   let (trys, varEnv) = tryStmt
+
 
     | If(e, stmt1, stmt2) -> 
       let (jumpend, C1) = makeJump C
@@ -302,6 +322,7 @@ and cExpr (e : expr) (varEnv : VarEnv) (funEnv : FunEnv) (lablist : LabEnv) (C :
     | CstInt i       -> addCST i C
     | CstFloat i     -> addCSTF i C
     | CstChar i      -> addCSTC i C
+    | CstString i    -> addCSTS i C
     | Addr acc       -> cAccess acc varEnv funEnv lablist C
     | UnaryPrim(ope, e1) ->
       let rec temp start =
