@@ -212,7 +212,7 @@ let rec cStmt stmt (varEnv : VarEnv) (funEnv : FunEnv) (lablist : LabEnv) (C : i
       addGOTO labelBegin C
     | Switch(e, body) ->
       let (labEnd, C1) = addLabel C
-      let lab = labEnd :: lablist
+      let lablist = labEnd :: lablist
       let rec allCase case = 
         match case with
         | [Case(n, content)] ->
@@ -228,7 +228,11 @@ let rec cStmt stmt (varEnv : VarEnv) (funEnv : FunEnv) (lablist : LabEnv) (C : i
           let (label, C2) = addLabel(cStmt last varEnv funEnv lablist C1)
           let (label2, C3) = addLabel(cExpr (BinaryPrim("==", e, e)) varEnv funEnv lablist (IFZERO labEnd :: C2 ))
           (label, label2, C3)
-
+        | Default(last) :: tr ->
+          let (labelNextBody, labelNext, C2) = allCase tr
+          let (label, C3) = addLabel(cStmt last varEnv funEnv lablist (addGOTO labelNextBody C2))
+          let (label2, C4) = addLabel(cExpr (BinaryPrim("==", e, e)) varEnv funEnv lablist (IFZERO labelNext :: C3 ))
+          (label, label2, C4)
       let (label, label2, C2) =
         allCase body
       C2

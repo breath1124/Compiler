@@ -141,6 +141,7 @@ StmtCase:
     CASE AtExprNotAccess COLON StmtM            { [Case($2, $4)] }
   | CASE AtExprNotAccess COLON StmtM StmtCase   { Case($2, $4) :: $5 }
   | DEFAULT COLON StmtM                         { [Default($3)] }
+  | DEFAULT COLON StmtM StmtCase                { Default($3) :: $4 }
 ;
 
 StmtU:
