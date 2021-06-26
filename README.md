@@ -13,6 +13,7 @@
 - 编译原理是计算机专业的一门重要专业课，旨在介绍编译程序构造的一般原理和基本方法。内容包括语言和文法、词法分析、语法分析、语法制导翻译、中间代码生成、存储管理、代码优化和目标代码生成。
 - 本次编译原理大作业，我选择了对microc进行改进，丰富完善它的功能，在这门课刚开始时，老师让我们选择一门没有接触过的语言进行学习并写出语言分析报告，当时我选择了Rust语言，Rust是一门系统编程语言，支持函数式和命令式以及泛型等编程范式的多范式语言，是静态的强类型的语言，是一种编译型语言，并且它有许多方便的语法和功能，所以在我改进microc时参考了C语言和Rust语言
 - Rust中的核心就是所有权，但在我想去实现它的时候发现异常困难，我对其本质的理解和对编译器的编写能力还有很大的提升空间，自身对技术的掌握也还远远不足，所以最终只是参考了其中的一些语法，并没有将其核心的内容加进去。
+- 由于是单人组队，时间不是很充分，有些功能实现的并不理想，运行程序的java虚拟机也是看懂之后自己进行了一些微调然后使用的。
 
 
 
@@ -40,12 +41,12 @@
 ## 用法
 
 - `dotnet "C:\Users\Administrator\.nuget\packages\fslexyacc\10.2.0\build\/fslex/netcoreapp3.1\fslex.dll" -o "Lex.fs" --module Lex --unicode Lex.fsl`生成词法分析器·
-
 - `dotnet "C:\Users\Administrator\.nuget\packages\fslexyacc\10.2.0\build\/fsyacc/netcoreapp3.1\fsyacc.dll"  -o "Par.fs" --module Par Par.fsy`生成语法分析器
 - `dotnet run -p microcc.fsproj test/xxx.c`编译test文件夹下的C语言程序
 - `javac Machine.java`生成虚拟机
-
 - `Java Machine ../test/xxx.out`在虚拟机中运行编译生成的.out文件
+
+
 
 ## 功能实现
 
@@ -78,6 +79,8 @@ int main()
 
 
 
+
+
 ### float类型
 
 - 介绍：实现了浮点数类型，从而使得程序可以进行更精确的计算
@@ -99,6 +102,8 @@ int main()
 
 
 
+
+
 ### char类型
 
 - 介绍：实现了字符型，方便对字符进一步操作
@@ -115,8 +120,6 @@ int main()
 - 运行结果
 
 <img src="img/char.png" alt="image-20210625203642675" style="zoom:67%;" />
-
-
 
 
 
@@ -147,8 +150,6 @@ int main()
 
 
 
-
-
 ### doWhile循环
 
 - 介绍：microc里已经实现了while循环，这里增加doWhile循环
@@ -168,8 +169,6 @@ int main()
 - 运行结果
 
 <img src="img/doWhile.png" alt="image-20210625204238551" style="zoom:67%;" />
-
-
 
 
 
@@ -297,8 +296,6 @@ int main()
 
 
 
-
-
 ### ? : 表达式
 
 - 介绍：三目运算符，C语言中的基本语法，大概用法如下： `x ? a : b`  如果x成立返回a，否则返回b
@@ -379,6 +376,25 @@ int main()
 
 
 
+### string类型
+
+- 介绍：相比起char类型，string类型有时候会更加方便，但我在实现的时候遇到了困难，最终只能将字符串的哈希码输出，完成的比较失败
+- 测试用例
+
+```c
+int main()
+{
+    string s = "ab";
+    print s;
+}
+```
+
+- 运行结果
+
+<img src="img/string.png" alt="image-20210626164839857" style="zoom:67%;" />
+
+
+
 ## 成员
 
 | 姓名 | 学号     | 班级       | 任务 | 权重 |
@@ -395,22 +411,74 @@ int main()
 
 ## 技术评价
 
-| 功能           | 测试代码          | 优   | 良   | 中   |
-| -------------- | ----------------- | ---- | ---- | ---- |
-| 自增自减       | autoPlus.c        | √    |      |      |
-| float          | float.c           | √    |      |      |
-| char           | char.c            | √    |      |      |
-| 变量声明时赋值 | var_init_assign.c | √    |      |      |
-| doWhile        | doWhile.c         | √    |      |      |
-| for            | for.c             | √    |      |      |
-| for in         | for_range.c       | √    |      |      |
-| loop           | loop.c            | √    |      |      |
-| break          | break.c           | √    |      |      |
-| continue       | continue.c        | √    |      |      |
-| ? :            | ternary.c         | √    |      |      |
-| switich-case   | switch.c          | √    |      |      |
-| default        | default.c         | √    |      |      |
-|                |                   |      |      |      |
+| 功能           | 测试代码          | 评分（1-5星） |
+| -------------- | ----------------- | ------------- |
+| 自增自减       | autoPlus.c        | ⭐⭐⭐⭐⭐         |
+| float          | float.c           | ⭐⭐⭐⭐⭐         |
+| char           | char.c            | ⭐⭐⭐⭐⭐         |
+| 变量声明时赋值 | var_init_assign.c | ⭐⭐⭐⭐⭐         |
+| doWhile        | doWhile.c         | ⭐⭐⭐⭐⭐         |
+| for            | for.c             | ⭐⭐⭐⭐⭐         |
+| for in         | for_range.c       | ⭐⭐⭐           |
+| loop           | loop.c            | ⭐⭐⭐⭐⭐         |
+| break          | break.c           | ⭐⭐⭐⭐⭐         |
+| continue       | continue.c        | ⭐⭐⭐⭐⭐         |
+| ? :            | ternary.c         | ⭐⭐⭐⭐⭐         |
+| switich-case   | switch.c          | ⭐⭐⭐⭐⭐         |
+| default        | default.c         | ⭐⭐⭐⭐⭐         |
+| string         | string.c          | ⭐             |
+
+
+
+## 项目说明
+
+- 项目是基于现有的microc代码进行改进
+  - 改进变量声明赋值模块
+  - 改进while循环模块
+  - 改进doWhile循环模块
+  - 改进float、char类型模块
+  - 改进for循环模块
+  - 改进变量自增自减模块
+
+- 项目独立开发
+  - 独立开发了loop循环模块
+  - 独立开发了switch-case-default模块
+  - 独立开发了break、continue模块
+  - 独立开发了？：表达式模块
+  - 独立开发了string模块（完成度差）
+
+
+
+## 解决技术要点说明
+
+- 解决float小数点问题1，关键代码与步骤如下
+
+  - 先在词法语法分析还有抽象语法树中中定义float，在编译器和虚拟机中添加相应的语法，先将float型变量转为整型存放在指令集中，然后通过栈式虚拟机再将其转换为浮点型，部分代码如下所示
+
+  ```F#
+  //词法分析
+  let keyword s =   
+      match s with
+      | "float"   -> FLOAT
+    	...  
+  
+  rule Token = parse
+    | ['0'-'9']+'.'['0'-'9']+ 
+                      { CSTFLOAT (System.Single.Parse (lexemeAsString lexbuf)) }  
+    ...
+    
+  
+  //Contcomp.fs
+  let rec addCSTF i C = 
+      match (i, C) with
+      | _                     -> (CSTF (System.BitConverter.SingleToInt32Bits(float32(i)))) :: C
+      
+  //Machine.java
+  case CSTF:
+      stack[sp + 1] = new CubyFloatType(Float.intBitsToFloat(program.get(pc++))); sp++; break;
+  ```
+
+  
 
 
 
@@ -418,5 +486,22 @@ int main()
 
 
 
+## 心得体会
 
+- 滕飞：
+
+  - 大作业开发过程心得
+
+    ​        在完成大作业的过程中，我对编译原理有了更深的认识，从刚开始学习F#语言到使用F#对microc进行改进，学习到了许多新的东西，对各种编程语言也有了一个大概的了解。由于是单人组队所以在写大作业的时候比较吃力，加上其他课程的大作业要完成，所以最后实现的功能并不是很完美还存在很大的提升空间，与真正成熟完整的编译器完全不能相提并论，但我觉得这门课的意义是让我们学习编译原理的思想，理解其本质，将这种抽象思维可以应用到更加广泛的方面。除此之外我也对编译器的实现有了一定的认识，词法分析、语法分析、抽象语法树、栈式虚拟机等等，每一个步骤都很重要，在整个过程中牵一发而动全身，比较遗憾的是由于时间和能力有所欠缺，一些功能没有实现，今后在学习"道"和"法"的路上还要不断努力。
+
+    - 对编译语言的实现过程有了一定认识
+    - 了解了不同的语言类型和优缺点
+    - 学习了函数式编程语言
+    - 了解了栈式虚拟机和指令集的构建
+    - 对语言的创造改进和计算思维有了全新的理解
+    - 在编程语言中实现一种新功能要考虑方方面面的问题
+
+  - 本课程建议
+
+    ​       这门课程对计算机专业的同学来说十分重要，对融会贯通计算思维也很有帮助，但感觉课程难度总体偏大，到了课程中后期才逐渐明白实现编程语言的步骤，有时候会觉得理论知识和编程实践联系不是很紧密，比如理论知识自己懂了，但在实验过程中往往不知道从何入手，我觉得可以多讲述一下实验的代码部分，课程难度可以根据同学的反馈程度作出适当调整。
 
