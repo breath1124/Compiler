@@ -19,11 +19,15 @@
   - `Lex.fsl`生成`Lex.fs`词法分析
   - `Par.fsy`生成`Par.fs`语法分析
   - `AstractSyn.fs`抽象语法树
-  - `Machine.fs`定义指令集
-  - `Contcomp.fs`进行编译
+  - `Machine.fs`指令集定义
+  - `Contcomp.fs`编译器
+  - `micorcc.fsproj`项目文件
 
 - 虚拟机：`Java实现`
+
   - `Machine.java`生成`Machine.class`和`Machinetrace.class`
+
+    
 
 - 示例代码：`test文件夹`
 - 运行结果：`img文件夹`
@@ -36,6 +40,7 @@
 
 - `dotnet "C:\Users\Administrator\.nuget\packages\fslexyacc\10.2.0\build\/fsyacc/netcoreapp3.1\fsyacc.dll"  -o "Par.fs" --module Par Par.fsy`生成语法分析器
 - `dotnet run -p microcc.fsproj test/xxx.c`编译test文件夹下的C语言程序
+- `javac Machine.java`生成虚拟机
 
 - `Java Machine ../test/xxx.out`在虚拟机中运行编译生成的.out文件
 
@@ -43,7 +48,7 @@
 
 - 自增自减
 
-  - 介绍
+  - 介绍：实现了自增自减操作，包括--i，++i，i++，i--
   - 测试用例
 
   ```c
@@ -72,7 +77,7 @@
 
 - float类型
 
-  - 介绍
+  - 介绍：实现了浮点数类型，从而使得程序可以进行更精确的计算
   - 测试用例
 
   ```c
@@ -93,7 +98,7 @@
 
 - char类型
 
-  - 介绍
+  - 介绍：实现了字符型，方便对字符进一步操作
   - 测试用例
 
   ```c
@@ -115,7 +120,7 @@
 
 
 - 变量定义赋值
-  - 介绍
+  - 介绍：在microc中变量要先定义再赋值，在这里将其合并为一步，方便简化编码操作
   - 测试用例
 
   ```c
@@ -141,7 +146,7 @@
 
 
 - doWhile循环
-  - 介绍
+  - 介绍：microc里已经实现了while循环，这里增加doWhile循环
   - 测试用例
 
   ```c
@@ -166,7 +171,7 @@
 
 
 - for循环
-  - 介绍
+  - 介绍：实现for循环，众多编程语言中的常见循环方式
   - 测试用例
 
   ```c
@@ -188,7 +193,7 @@
 
 
 - for range循环
-  - 介绍
+  - 介绍：除了for、while等循环，在rust中还有for in，loop等循环方式，此循环操作是左闭右开区间
   - 测试用例
 
   ```c
@@ -210,7 +215,7 @@
 
 
 - loop循环
-  - 介绍
+  - 介绍：与while(1)循环无限循环类似，在rust语言中直接定义了loop无限循环的方式，在需要是进行break或者return即可，有一定的实用性，所以在microc改进里我也增加了此种循环方式。
   - 测试用例
 
   ```c
@@ -236,7 +241,7 @@
 
 - break功能
 
-  - 介绍
+  - 介绍：当循环满足一定条件需要退出时break就显的十分重要，所以在所有循环中都加入了break功能
   - 测试用例
 
   ```c
@@ -261,7 +266,7 @@
 
 - continue循环
 
-  - 介绍
+  - 介绍：continue和break的重要性相同，当某些条件不需要进入循环但又不想让循环就此结束时break就不合适了，这时候需要用到continue功能
   - 测试用例
 
   ```c
@@ -287,7 +292,7 @@
 
 
 - ? : 表达式
-  - 介绍
+  - 介绍：三目运算符，C语言中的基本语法，大概用法如下： `x ? a : b`  如果x成立返回a，否则返回b
   - 测试用例
 
   ```c
@@ -309,7 +314,7 @@
 
 
 - switch-case功能
-  - 介绍
+  - 介绍：在switch中对相应的case进行匹配，匹配成功后执行之后的所有语句，没有相应匹配时不执行操作
   - 测试用例
 
   ```c
@@ -335,7 +340,7 @@
 
 
 - default功能
-  - 介绍
+  - 介绍：在上述switch-case功能中，若没有匹配项则不进行任何操作，这里加入default语句，不论是否匹配成功，default对应的语句一定会被执行
   - 测试用例
 
   ```c
