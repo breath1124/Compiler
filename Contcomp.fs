@@ -90,12 +90,12 @@ let rec addCSTC i C =
 let encoding = System.Text.ASCIIEncoding();
 
 // let rec addCSTS i C = 
-//     match (i, C) with
-//     | _                     -> (CSTS ((int32)(System.BitConverter.ToString ((encoding.GetBytes(string(i))),0)))) :: C
+    // match (i, C) with
+    // | _                     -> (CSTS ((int32)(System.BitConverter.ToString (System.Text.Encoding.Default.GetBytes(i+""))))) :: C
 
 let rec addCSTS i C = 
     match (i, C) with
-    | _                     -> (CSTS ((int32)(System.BitConverter.ToString (System.Text.Encoding.Default.GetBytes(i+""))))) :: C
+    | _                     -> (CSTS ((int32)(System.BitConverter.ToInt16 (System.ReadOnlySpan(System.Text.Encoding.Default.GetBytes(i+"")))))) :: C
 
 (* 环境 *)
 

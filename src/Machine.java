@@ -17,13 +17,6 @@ public class Machine {
             execute(args, false);
         }
 
-//        args = new String[1];
-//        args[0] = "D:\\Yuby\\Cuby\\testing\\ex(float).out";
-////        args[1] = "Hello";
-////        args[2] = "1.2";
-////        args[3] = "100";
-////        args[4] = "123Hel";
-//        execute(args, false);
     }
 
     final static int
@@ -66,34 +59,6 @@ public class Machine {
         }
 
 
-//        for(int i = 0; i < inputArgs.length; ++i){
-//            if(inputArgs[i] instanceof CubyArrayType){
-//                CubyBaseType[] a = ((CubyArrayType)inputArgs[i]).getValue();
-//                for(int j = 0; j < a.length; ++j){
-//                    if(a[j] instanceof CubyCharType){
-//                        System.out.print(((CubyCharType)a[j]).getValue());
-//                    }
-//                    else if(a[j] instanceof CubyIntType){
-//                        System.out.print(((CubyIntType)a[j]).getValue());
-//                    }
-//                    else if(a[j] instanceof CubyFloatType){
-//                        System.out.print(((CubyFloatType)a[j]).getValue());
-//                    }
-//                }
-//                System.out.println();
-//            }
-//            else if(inputArgs[i] instanceof CubyCharType){
-//                System.out.println(((CubyCharType)inputArgs[i]).getValue());
-//            }
-//            else if(inputArgs[i] instanceof CubyIntType){
-//                System.out.println(((CubyIntType)inputArgs[i]).getValue());
-//            }
-//            else if(inputArgs[i] instanceof CubyFloatType){
-//                System.out.println(((CubyFloatType)inputArgs[i]).getValue());
-//            }
-//
-//        }
-
         long startTime = System.currentTimeMillis();
         execCode(program, stack, inputArgs, trace);
         long runtime = System.currentTimeMillis() - startTime;
@@ -116,8 +81,11 @@ public class Machine {
                     stack[sp + 1] = new CubyFloatType(Float.intBitsToFloat(program.get(pc++))); sp++; break;
                 case CSTC:
                     stack[sp + 1] = new CubyCharType((char)(program.get(pc++).intValue())); sp++; break;
-                case CSTS:
-                    stack[sp + 1] = new CubyStringType((String.valueOf(program.get(pc++).intValue()))); sp++; break;
+                case CSTS: {
+                    stack[sp + 1] = new CubyStringType((String.valueOf(program.get(pc++).intValue()))); 
+                    sp++; 
+                    break;
+                }
                 case ADD: {
                     stack[sp - 1] = binaryOperator(stack[sp-1], stack[sp], "+");
                     sp--;

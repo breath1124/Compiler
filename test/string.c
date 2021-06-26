@@ -1,6 +1,6 @@
 int main()
 {
-    string s = "a";
+    string s = "ab";
     print s;
 }
 
