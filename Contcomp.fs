@@ -18,14 +18,14 @@ let rec addINCSP m1 C : instrs list =
     | Label lab :: RET m2 :: _  -> RET (m2-m1) :: C
     | _                         -> if m1=0 then C else INCSP m1 :: C
 
-let addLabel C : label * instrs list =    
+let addLabel C : label * instrs list =            // 条件跳转
     match C with
     | Label lab :: _ -> (lab, C)
     | GOTO lab :: _  -> (lab, C)
     | _              -> let lab = newLabel() 
                         (lab, Label lab :: C)
 
-let makeJump C : instrs * instrs list =        
+let makeJump C : instrs * instrs list =          // 无条件跳转
     match C with
     | RET m              :: _ -> (RET m, C)
     | Label lab :: RET m :: _ -> (RET m, C)
@@ -98,7 +98,7 @@ let rec addCSTS i C =
     match (i, C) with
     | _                     -> (CSTS ((int32)(System.BitConverter.ToInt16 (System.ReadOnlySpan(System.Text.Encoding.Default.GetBytes(i+"")))))) :: C
 
-(* 环境 *)
+(* 环境操作 *)
 
 type 'data Env = (string * 'data) list
 
@@ -109,12 +109,14 @@ let rec lookup env x =
 
 
 type Var = 
-    | Glovar of int      
-    | Locvar of int      
+    | Glovar of int      // 栈中的绝对地址   
+    | Locvar of int      // 栈底的相对地址
 
 
+// 变量环境追踪全局变量和局部变量
 type VarEnv = (Var * typ) Env * int
-type StructTypeEnv = (string * (Var * typ) Env * int) list 
+
+// 函数环境
 type Paramdecs = (typ * string) list
 type FunEnv = (label * typ option * Paramdecs) Env
 type LabEnv = label list
@@ -132,6 +134,7 @@ let rec exitOne labs =
     | []        -> []
 
 
+// 绑定varEnv中声明的变量并生成代码进行分配
 let allocate (kind : int -> Var) (typ, x) (varEnv : VarEnv) : VarEnv * instrs list =
     let (env, fdepth) = varEnv 
     match typ with
@@ -146,6 +149,7 @@ let allocate (kind : int -> Var) (typ, x) (varEnv : VarEnv) : VarEnv * instrs li
       (newEnv, code)
 
 
+// 绑定varEnv中声明的参数
 let bindParam (env, fdepth) (typ, x) : VarEnv = 
     ((x, (Locvar fdepth, typ)) :: env, fdepth+1);
 
@@ -176,7 +180,6 @@ let bindParams paras (env, fdepth) : VarEnv =
 //     addv topdecs ([], 0) []
     
 (* ------------------------------------------------------------------- *)
-
 
 
 let rec cStmt stmt (varEnv : VarEnv) (funEnv : FunEnv) (lablist : LabEnv) (C : instrs list) : instrs list = 
@@ -404,7 +407,9 @@ and cExpr (e : expr) (varEnv : VarEnv) (funEnv : FunEnv) (lablist : LabEnv) (C :
            (IFNZRO labtrue 
              :: cExpr e2 varEnv funEnv lablist (addJump jumpend C2))
     | Call(f, es) -> callfun f es varEnv funEnv lablist C
-    
+
+
+// 构建全局变量和全局函数的环境
 and makeGlobalEnvs(topdecs : topDec list) : VarEnv * FunEnv * instrs list = 
     let rec addv decs varEnv funEnv = 
         match decs with 
@@ -424,7 +429,7 @@ and makeGlobalEnvs(topdecs : topDec list) : VarEnv * FunEnv * instrs list =
     addv topdecs ([], 0) []
 
 
-
+// 生成访问变量、解引用指针或索引数组的代码
 and cAccess access varEnv funEnv lablist C = 
     match access with 
     | AccVar x   ->
@@ -437,12 +442,14 @@ and cAccess access varEnv funEnv lablist C =
       cAccess acc varEnv funEnv lablist (LDI :: cExpr idx varEnv funEnv lablist (ADD :: C))
 
 
+// 多个参数
 and cExprs es varEnv funEnv lablist C = 
     match es with 
     | []     -> C
     | e1::er -> cExpr e1 varEnv funEnv lablist (cExprs er varEnv funEnv lablist C)
 
-    
+
+// 参数es 调用函数f
 and callfun f es varEnv funEnv lablist C : instrs list =
     let (labf, tyOpt, paramdecs) = lookup funEnv f
     let argc = List.length es
@@ -452,7 +459,7 @@ and callfun f es varEnv funEnv lablist C : instrs list =
       failwith (f + ": parameter/argument mismatch")
 
 
-
+// 编译一个完成的程序  包括全局变量、调用main、函数等
 let cProgram (Prog topdecs) : instrs list = 
     let _ = resetLabels ()
     let ((globalVarEnv, _), funEnv, globalInit) = makeGlobalEnvs topdecs
@@ -475,6 +482,7 @@ let cProgram (Prog topdecs) : instrs list =
     @ List.concat functions
 
 
+// 在抽象语法树中编译程序并将其写入文件，返回程序的指令集列表
 let intsToFile (inss : int list) (fname : string) = 
     File.WriteAllText(fname, String.concat " " (List.map string inss))
 

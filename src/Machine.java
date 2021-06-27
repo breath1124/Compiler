@@ -19,6 +19,7 @@ public class Machine {
 
     }
 
+    // 指令集代码  与Machine.fs对应
     final static int
         CSTI = 0, ADD = 1, SUB = 2, MUL = 3, DIV = 4, MOD = 5, 
         EQ = 6, LT = 7, NOT = 8, 
@@ -34,13 +35,15 @@ public class Machine {
   
     final static int STACKSIZE = 1000;
 
+    // 读取执行文件代码
     static void execute(String[] args, boolean trace) throws FileNotFoundException, IOException, OperatorError, ImcompatibleTypeError {
         ArrayList<Integer> program = readfile(args[0]);
 
         CubyBaseType[] stack = new CubyBaseType[STACKSIZE];
 
-        CubyBaseType[] inputArgs = new CubyBaseType[args.length - 1];
+        CubyBaseType[] inputArgs = new CubyBaseType[args.length - 1];    
 
+        // push命令行参数
         for (int i = 1; i < args.length; i++) {
             if(Pattern.compile("(?i)[a-z]").matcher(args[i]).find()){
                 char[] input = args[i].toCharArray();
@@ -65,10 +68,12 @@ public class Machine {
         System.err.println("\nRan " + runtime/1000.0 + " seconds");
     }
 
+
+    // 从p[pc]开始执行代码
     private static int execCode(ArrayList<Integer> program, CubyBaseType[] stack, CubyBaseType[] inputArgs, boolean trace) throws ImcompatibleTypeError, OperatorError {
-        int bp = -999;
-        int sp = -1;
-        int pc = 0;
+        int bp = -999;  // 基指针，用于访问局部变量
+        int sp = -1;    // 栈顶指针 
+        int pc = 0;     // 计数器：下一条指令
         int hr = -1;
         for (;;) {
             if (trace)
@@ -156,9 +161,9 @@ public class Machine {
                     CubyBaseType tmp = stack[sp];  stack[sp] = stack[sp-1];  stack[sp-1] = tmp;
                     break;
                 }
-                case LDI:
+                case LDI:       // 间接加载
                     stack[sp] = stack[((CubyIntType)stack[sp]).getValue()]; break;
-                case STI:
+                case STI:       // 间接存储 （在栈顶
                     stack[((CubyIntType)stack[sp-1]).getValue()] = stack[sp]; stack[sp-1] = stack[sp]; sp--; break;
                 case GETBP:
                     stack[sp+1] = new CubyIntType(bp); sp++; break;
@@ -192,8 +197,8 @@ public class Machine {
                 }
                 case CALL: {
                     int argc = program.get(pc++);
-                    for (int i=0; i<argc; i++)
-                        stack[sp-i+2] = stack[sp-i];
+                    for (int i=0; i<argc; i++)          // 为返回地址清理空间
+                        stack[sp-i+2] = stack[sp-i];    // 旧的基指针
                     stack[sp-argc+1] = new CubyIntType(pc+1); sp++;
                     stack[sp-argc+1] = new CubyIntType(bp);   sp++;
                     bp = sp+1-argc;
@@ -201,9 +206,9 @@ public class Machine {
                     break;
                 }
                 case TCALL: {
-                    int argc = program.get(pc++);
-                    int pop  = program.get(pc++);
-                    for (int i=argc-1; i>=0; i--)
+                    int argc = program.get(pc++);       // 新参数的数量
+                    int pop  = program.get(pc++);       // 无用的变量数量
+                    for (int i=argc-1; i>=0; i--)       // 无用的变量
                         stack[sp-i-pop] = stack[sp-i];
                     sp = sp - pop; pc = program.get(pc);
                 } break;
@@ -230,7 +235,7 @@ public class Machine {
                 case PRINTC:
                     System.out.print((((CubyCharType)stack[sp])).getValue()); break;
                 case LDARGS:
-                    for (int i=0; i < inputArgs.length; i++) // Push commandline arguments
+                    for (int i=0; i < inputArgs.length; i++) // Push命令行参数
                         stack[++sp] = inputArgs[i];
                     break;
                 case STOP:
@@ -356,6 +361,7 @@ public class Machine {
     }
 
 
+     // 从p[pc]处打印堆栈机器指令
     private static String insName(ArrayList<Integer> program, int pc) {
         switch (program.get(pc)) {
             case CSTI:   return "CSTI " + program.get(pc+1);
@@ -392,6 +398,7 @@ public class Machine {
     }
 
 
+    // 打印当前的栈和指令
     private static void printSpPc(CubyBaseType[] stack, int bp, int sp, ArrayList<Integer> program, int pc) {
         System.out.print("[ ");
         for (int i = 0; i <= sp; i++) {
@@ -410,6 +417,7 @@ public class Machine {
     }
 
 
+    // 从文件中读指令
     private static ArrayList<Integer> readfile(String filename) throws FileNotFoundException, IOException {
         ArrayList<Integer> program = new ArrayList<Integer>();
         Reader inp = new FileReader(filename);
@@ -429,6 +437,7 @@ public class Machine {
 }
 
 
+// 使用trace命令执行时打印每条指令
 class Machinetrace {
     public static void main(String[] args)
             throws FileNotFoundException, IOException, OperatorError, ImcompatibleTypeError {
