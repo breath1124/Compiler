@@ -65,7 +65,6 @@ public class Machine {
         System.err.println("\nRan " + runtime/1000.0 + " seconds");
     }
 
-
     private static int execCode(ArrayList<Integer> program, CubyBaseType[] stack, CubyBaseType[] inputArgs, boolean trace) throws ImcompatibleTypeError, OperatorError {
         int bp = -999;
         int sp = -1;

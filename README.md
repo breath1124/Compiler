@@ -405,7 +405,7 @@ int main()
 
 ## 提交日志
 
-
+<img src="img/commit.png" alt="image-20210627114326720" style="zoom:67%;" />
 
 
 
@@ -456,7 +456,7 @@ int main()
   - 先在词法语法分析还有抽象语法树中中定义float，在编译器和虚拟机中添加相应的语法，先将float型变量转为整型存放在指令集中，然后通过栈式虚拟机再将其转换为浮点型，部分代码如下所示
 
   ```F#
-  //词法分析
+  //lex.fsl
   let keyword s =   
       match s with
       | "float"   -> FLOAT
@@ -480,7 +480,40 @@ int main()
 
   
 
+解决default问题2，关键代码与步骤如下
 
+- 先在词法语法分析还有抽象语法树中中定义default，添加相应的语法，刚开始时以为default功能实现完整，测试之后发现如果放在case之前则会报错，经过检查代码之后发现是忽略了写在case前边的语句，将其添加之后错误解决，部分关键代码如下
+
+```F#
+//Par.fsy
+StmtCase:
+    CASE AtExprNotAccess COLON StmtM            { [Case($2, $4)] }
+  | CASE AtExprNotAccess COLON StmtM StmtCase   { Case($2, $4) :: $5 }
+  | DEFAULT COLON StmtM                         { [Default($3)] }
+  | DEFAULT COLON StmtM StmtCase                { Default($3) :: $4 }
+;
+
+
+//Contcomp.fs
+let rec cStmt stmt (varEnv : VarEnv) (funEnv : FunEnv) (lablist : LabEnv) (C : instrs list) : instrs list = 
+    match stmt with
+    ......
+    | Switch(e, body) ->
+      let (labEnd, C1) = addLabel C
+      let lablist = labEnd :: lablist
+      let rec allCase case = 
+        match case with
+		......
+        | [Default(last)] ->
+          let (label, C2) = addLabel(cStmt last varEnv funEnv lablist C1)
+          let (label2, C3) = addLabel(cExpr (BinaryPrim("==", e, e)) varEnv funEnv lablist (IFZERO labEnd :: C2 ))
+          (label, label2, C3)
+        | Default(last) :: tr ->
+          let (labelNextBody, labelNext, C2) = allCase tr
+          let (label, C3) = addLabel(cStmt last varEnv funEnv lablist (addGOTO labelNextBody C2))
+          let (label2, C4) = addLabel(cExpr (BinaryPrim("==", e, e)) varEnv funEnv lablist (IFZERO labelNext :: C3 ))
+          (label, label2, C4)
+```
 
 
 

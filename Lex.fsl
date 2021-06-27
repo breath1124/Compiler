@@ -1,4 +1,5 @@
 {
+    
 // 词法分析
 // 用下边的命令生成词法分析器Lex.fs
 // dotnet "C:\Users\Administrator\.nuget\packages\fslexyacc\10.2.0\build\/fslex/netcoreapp3.1\fslex.dll"  -o "Lex.fs" --module Lex --unicode Lex.fsl
